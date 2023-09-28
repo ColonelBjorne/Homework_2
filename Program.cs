@@ -87,3 +87,50 @@ app.MapDelete("/books/{id}", (int id, IBookService bookService) =>
 });
 
 app.Run();
+
+public ActionResult<IEnumerable<Author>> GetAllAuthors()
+{
+    var authors = _authorService.GetAllAuthors();
+    return Ok(authors);
+}
+
+[HttpGet("{id}")]
+public ActionResult<Author> GetAuthorById(int id)
+{
+    var author = _authorService.GetAuthorById(id);
+    if (author == null)
+    {
+        return NotFound(); // Return 404 if author not found
+    }
+    return Ok(author);
+}
+
+[HttpPost]
+public ActionResult<Author> AddAuthor(Author author)
+{
+    _authorService.AddAuthor(author);
+    return CreatedAtAction(nameof(GetAuthorById), new { id = author.Id }, author);
+}
+
+[HttpPut("{id}")]
+public IActionResult UpdateAuthor(int id, Author author)
+{
+    if (id != author.Id)
+    {
+        return BadRequest(); // Return 400 if the IDs don't match
+    }
+    _authorService.UpdateAuthor(author);
+    return NoContent(); // Return 204 for a successful update
+}
+
+[HttpDelete("{id}")]
+public IActionResult DeleteAuthor(int id)
+{
+    var author = _authorService.GetAuthorById(id);
+    if (author == null)
+    {
+        return NotFound(); // Return 404 if author not found
+    }
+    _authorService.DeleteAuthor(id);
+    return NoContent(); // Return 204 for a successful delete
+}
